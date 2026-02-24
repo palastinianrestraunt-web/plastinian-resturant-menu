@@ -9,6 +9,9 @@
   justify-content: center;
   gap: 1rem;
   padding: 0 1rem 1.5rem 1rem;
+  border-radius: 50px;
+  margin: 0 auto;
+  width: fit-content;
 }
 
 .orderIcon {
@@ -151,18 +154,19 @@
 }
 
 .allergy_title {
-color: #808080;
-padding-right: 0.4rem;
-font-weight: 400;
+  color: #808080;
+  padding-right: 0.4rem;
+  font-weight: 400;
 }
 
-.allergy_wrapper{
+.allergy_wrapper {
   display: flex;
   width: 100%;
 }
+
 .allergy {
   /* position: absolute; */
-width: auto;
+  width: auto;
   /* border-radius: 0px 0px 8px 8px; */
   /* width: calc(160px - 1.5rem); */
   text-align: left;
@@ -561,26 +565,42 @@ width: auto;
 
   .orderButtons {
     position: fixed;
-    bottom: 0;
+    bottom: 10;
     left: 0;
     right: 0;
     z-index: 999;
-    padding: 0.75rem 1rem;
+    padding: 0.50rem 0.75rem;
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 -1px 12px rgba(0, 0, 0, 0.08);
     gap: 0.75rem;
+    width: fit-content;
+    border-radius: 50px;
+    margin: 0 auto;
   }
 
   .orderButton {
     flex: 1;
-    padding: 0.65rem 1rem;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .orderIcon {
     font-size: 0.9rem;
+    margin-right: 0.3rem;
   }
 
   .langSelector {
-    bottom: 70px !important;
+    position: static !important;
+    box-shadow: none;
+    padding: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .langSelector img {
+    width: 24px;
+    height: 24px;
   }
 
   .footer_top {

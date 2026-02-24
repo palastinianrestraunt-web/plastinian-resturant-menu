@@ -1,9 +1,8 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import Head from "next/head";
 import Image from "next/image";
-import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
-import { checkEnvironment, groupArrayByCategory } from "../helpers";
 import {
   Categories,
   Categories_en,
@@ -11,21 +10,16 @@ import {
   MenuItem,
   MenuItemOption,
 } from "@/models/menu";
-import { it } from "node:test";
-import AllargyItem from "@/components/AllargyItem";
-const inter = Inter({ subsets: ["latin"] });
+import AllargyItem from "./AllargyItem";
 
-export default function Home({ data }: { data: MenuItem[] }) {
+type Props = {
+  grouped: MenuCategory[];
+};
+
+export default function MenuPage({ grouped }: Props) {
   const [lang, setLang] = useState("cz");
-  const [grouped, setGrouped] = useState<Array<MenuCategory>>([]);
   const [showTopNav, setShowTopNav] = useState(false);
   const orderButtonsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (data.length) setGrouped(groupArrayByCategory(data));
-
-    return () => { };
-  }, [data]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,24 +32,8 @@ export default function Home({ data }: { data: MenuItem[] }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // console.log({ data, grouped });
   return (
     <>
-      <Head>
-        <title>Palestinian Restaurant</title>
-        <meta name="description" content="Palestinian restaurant menu" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        ></link>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Delicious+Handrawn&family=Fondamento&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
       <nav className={`${styles.topNav} ${showTopNav ? styles.topNavVisible : ""}`}>
         <Image
           src={`/logo_h.svg`}
@@ -95,6 +73,28 @@ export default function Home({ data }: { data: MenuItem[] }) {
           />
         </header>
         <div className={styles.orderButtons} ref={orderButtonsRef}>
+          <div
+            className={styles.langSelector}
+            onClick={() => {
+              setLang((prev) => (prev === "en" ? "cz" : "en"));
+            }}
+          >
+            {lang == "en" ? (
+              <img
+                src={"./czech-republic.png"}
+                width={30}
+                height={30}
+                alt="change menu language"
+              />
+            ) : (
+              <img
+                src={"./united-kingdom.png"}
+                width={30}
+                height={30}
+                alt="change menu language"
+              />
+            )}
+          </div>
           <a
             href="https://palestinianrestaurant.choiceqr.com/en/takeaway/section:menu"
             target="_blank"
@@ -114,31 +114,9 @@ export default function Home({ data }: { data: MenuItem[] }) {
             {lang === "en" ? "Order Delivery" : "Objednat rozvoz"}
           </a>
         </div>
-        <div
-          className={styles.langSelector}
-          onClick={() => {
-            setLang((prev) => (prev === "en" ? "cz" : "en"));
-          }}
-        >
-          {lang == "en" ? (
-            <img
-              src={"./czech-republic.png"}
-              width={30}
-              height={30}
-              alt="change menu language"
-            />
-          ) : (
-            <img
-              src={"./united-kingdom.png"}
-              width={30}
-              height={30}
-              alt="change menu language"
-            />
-          )}
-        </div>
         {grouped.length > 0 &&
           grouped.map((cat: MenuCategory) => (
-            <div className={styles.menu} key={`menu_category_${cat}`}>
+            <div className={styles.menu} key={`menu_category_${cat.category}`}>
               <h2 className={styles.menu_group_heading}>
                 {lang === "en"
                   ? Categories_en[cat.category]
@@ -181,8 +159,9 @@ export default function Home({ data }: { data: MenuItem[] }) {
                               <span className={styles.order_nummber}>
                                 {item.number}.
                               </span>{" "}
-                              {` ${lang === "en" ? item.en_name : item.cz_name
-                                }`}
+                              {` ${
+                                lang === "en" ? item.en_name : item.cz_name
+                              }`}
                             </span>
                             <span className={styles.menu_item_name_sub}>
                               {lang === "en" ? item.cz_name : item.en_name}
@@ -237,32 +216,29 @@ export default function Home({ data }: { data: MenuItem[] }) {
                     {item.options && (
                       <div className={styles.menu_item_option_wrapp}>
                         {item.options.map((option: MenuItemOption) => (
-                          <>
-                            <div className={styles.menu_item_option}>
-                              <span className={styles.menu_item_option_name}>
-                                {" "}
-                                {lang === "en"
-                                  ? option.en_name
-                                  : option.cz_name}
+                          <div
+                            className={styles.menu_item_option}
+                            key={`option_${item.id}_${option.en_name}`}
+                          >
+                            <span className={styles.menu_item_option_name}>
+                              {" "}
+                              {lang === "en" ? option.en_name : option.cz_name}
+                            </span>
+                            <span className={styles.menu_item_option_price}>
+                              <span
+                                className={styles.menu_item_option_price_amount}
+                              >
+                                {option.price}
                               </span>
-                              <span className={styles.menu_item_option_price}>
-                                <span
-                                  className={
-                                    styles.menu_item_option_price_amount
-                                  }
-                                >
-                                  {option.price}
-                                </span>
-                                <span
-                                  className={
-                                    styles.menu_item_option_price_currency
-                                  }
-                                >
-                                  CZK
-                                </span>
+                              <span
+                                className={
+                                  styles.menu_item_option_price_currency
+                                }
+                              >
+                                CZK
                               </span>
-                            </div>
-                          </>
+                            </span>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -295,8 +271,6 @@ export default function Home({ data }: { data: MenuItem[] }) {
             <a href="https://maps.app.goo.gl/Lj9YspNJBbt3D8318?g_st=ic">
               {" "}
               <span>Spálená 90/17, 110 00 Nové Město, Czechia</span>
-              {/* <div className={styles.map}
-                title="Map showing business location."></div> */}
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d687.0243070229683!2d14.419349692681253!3d50.07944708762389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b95aeb20f33f9%3A0x39e0e5ab0d4b3374!2sMr.%20Falafel!5e0!3m2!1sen!2seg!4v1680509042141!5m2!1sen!2seg"
                 width="100%"
@@ -327,59 +301,45 @@ export default function Home({ data }: { data: MenuItem[] }) {
               <table itemProp="openingHours">
                 <tbody>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Monday:" : "Pondělí:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Monday:" : "Pondělí:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Tuesday:" : "Úterý:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Tuesday:" : "Úterý:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Wednesday:" : "Středa:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Wednesday:" : "Středa:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Thursday:" : "Čtvrtek:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Thursday:" : "Čtvrtek:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Friday:" : "Pátek:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Friday:" : "Pátek:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Saturday:" : "Sobota:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Saturday:" : "Sobota:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                   <tr>
-                    <th className="x2TOCf">
-                      {lang === "en" ? "Sunday:" : "Neděle:"}
-                    </th>
-                    <td className="o0m3Qb">
-                      <span className="WF8WNe">10:00 - 22:00</span>
+                    <th>{lang === "en" ? "Sunday:" : "Neděle:"}</th>
+                    <td>
+                      <span>10:00 - 22:00</span>
                     </td>
                   </tr>
                 </tbody>
@@ -397,8 +357,8 @@ export default function Home({ data }: { data: MenuItem[] }) {
           />
 
           <div className={styles.copyright}>
-            Copyright © 2023 Palestinian restaurant - All rights reserved <br />{" "}
-            Designed By:{" "}
+            Copyright © 2023 Palestinian restaurant - All rights reserved{" "}
+            <br /> Designed By:{" "}
             <a target="_blank" href="http://digitalizers.co/">
               Digitalizers agency
             </a>
@@ -408,28 +368,8 @@ export default function Home({ data }: { data: MenuItem[] }) {
             <div className={styles.flag_middle}></div>
             <div className={styles.flag_triangle}></div>
           </div>
-          {/* {lang == 'en' ? 'CZ' : 'EN'} */}
         </div>
       </footer>
     </>
   );
-}
-
-// This gets called on every request
-export async function getStaticProps() {
-  // Fetch data from external API
-  const base_url = checkEnvironment();
-  const newUrl =
-    base_url.charAt(base_url.length - 1) === "/"
-      ? `${base_url}data.json`
-      : `${base_url}/data.json`;
-  const res = await fetch(newUrl, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
-  const data = await res.json();
-  // Pass data to the page via props
-  return { props: { data } };
 }
