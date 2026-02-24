@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
@@ -18,11 +18,25 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home({ data }: { data: MenuItem[] }) {
   const [lang, setLang] = useState("cz");
   const [grouped, setGrouped] = useState<Array<MenuCategory>>([]);
+  const [showTopNav, setShowTopNav] = useState(false);
+  const orderButtonsRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (data.length) setGrouped(groupArrayByCategory(data));
 
     return () => { };
   }, [data]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (orderButtonsRef.current) {
+        const rect = orderButtonsRef.current.getBoundingClientRect();
+        setShowTopNav(rect.bottom < 0);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // console.log({ data, grouped });
   return (
@@ -34,7 +48,7 @@ export default function Home({ data }: { data: MenuItem[] }) {
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         ></link>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -42,6 +56,34 @@ export default function Home({ data }: { data: MenuItem[] }) {
           rel="stylesheet"
         />
       </Head>
+      <nav className={`${styles.topNav} ${showTopNav ? styles.topNavVisible : ""}`}>
+        <Image
+          src={`/logo_h.svg`}
+          width="200"
+          height="40"
+          alt="Palestinian Restaurant logo"
+        />
+        <div className={styles.topNavButtons}>
+          <a
+            href="https://palestinianrestaurant.choiceqr.com/en/takeaway/section:menu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.orderButton}
+          >
+            <i className={`fa-solid fa-person-walking ${styles.orderIcon}`}></i>
+            {lang === "en" ? "Order Takeaway" : "Objednat s sebou"}
+          </a>
+          <a
+            href="https://palestinianrestaurant.choiceqr.com/en/delivery/section:menu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.orderButton}
+          >
+            <i className={`fa-solid fa-motorcycle ${styles.orderIcon}`}></i>
+            {lang === "en" ? "Order Delivery" : "Objednat rozvoz"}
+          </a>
+        </div>
+      </nav>
       <main className={styles.container}>
         <header>
           <Image
@@ -52,6 +94,26 @@ export default function Home({ data }: { data: MenuItem[] }) {
             alt="Palestinian Restaurant logo"
           />
         </header>
+        <div className={styles.orderButtons} ref={orderButtonsRef}>
+          <a
+            href="https://palestinianrestaurant.choiceqr.com/en/takeaway/section:menu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.orderButton}
+          >
+            <i className={`fa-solid fa-person-walking ${styles.orderIcon}`}></i>
+            {lang === "en" ? "Order Takeaway" : "Objednat s sebou"}
+          </a>
+          <a
+            href="https://palestinianrestaurant.choiceqr.com/en/delivery/section:menu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.orderButton}
+          >
+            <i className={`fa-solid fa-motorcycle ${styles.orderIcon}`}></i>
+            {lang === "en" ? "Order Delivery" : "Objednat rozvoz"}
+          </a>
+        </div>
         <div
           className={styles.langSelector}
           onClick={() => {
@@ -222,12 +284,12 @@ export default function Home({ data }: { data: MenuItem[] }) {
               <a
                 target="_blank"
                 href="https://m.facebook.com/profile.php?id=100080996603475"
-                className="fa fa-facebook"
+                className="fa-brands fa-facebook"
               ></a>
               <a
                 target="_blank"
                 href="https://www.instagram.com/palestinian_restaurant_prague/"
-                className="fa fa-instagram"
+                className="fa-brands fa-instagram"
               ></a>
             </div>
             <a href="https://maps.app.goo.gl/Lj9YspNJBbt3D8318?g_st=ic">
