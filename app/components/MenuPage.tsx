@@ -357,6 +357,11 @@ export default function MenuPage({ grouped }: Props) {
           />
 
           <div className={styles.copyright}>
+            <div className={styles.company_info}>
+              Společnost: GLASSEXPORT s.r.o.
+              <br />
+              IČ: 02715007 &nbsp;|&nbsp; DIČ: CZ02715007
+            </div>
             Copyright © 2023 Palestinian restaurant - All rights reserved{" "}
             <br /> Designed By:{" "}
             <a target="_blank" href="http://digitalizers.co/">
